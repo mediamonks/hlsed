@@ -1,0 +1,63 @@
+<html>
+<head></head>
+<body>
+	<h1>hlsed</h1>
+	<p>This is something that can modify properties of the existing HLS playlists (<a href="https://developer.apple.com/streaming/">HTTP Live Streaming</a>, <a href="https://tools.ietf.org/html/rfc8216">RFC8216</a>) on the fly for testing purposes.</p>
+	<p>Supported operations:</p>
+	<ul>
+		<li>turning a regular or a <code>VOD</code> playlist into an <code>EVENT</code> one so it appears as a live broadcast to the player and turns into a <code>VOD</code> playlist after the specified duration.</li>
+	</ul>
+	
+	<h2>Usage</h2>
+	<p>Currently all operations are performed via <code>{{ url_for('proxy') }}</code> endpoint on this server, where the following parameters can be passed via the query string:</p>
+	<ul>
+		<li>
+			<p><code>{{ url_arg }}</code> The URL of the playlist to modify. Required.</p>
+			<p>In addition to regular URLs this also allows to use "aliases", short identifiers of a few publicly available playlist examples (e.g. <code>{{ aliases.keys()[0] }}</code>), see the list of supported aliases below.</p>
+			<p>Note that the URL can point both to a master or a media playlist. All the media playlist URLs in the master playlists will be modified to be passed via this endpoint with the same parameters (except the <code>url</code> of course).</p>
+		</li>
+		<li>
+			<p><code>{{ start_time_arg }}</code> The reference time for the event, a Unix timestamp.</p>
+			<p>Required for the media playlists. Optional for master playlists (where it is assumed to be the time the playlist is downloaded).</p>
+			<p>This is not exactly the time the event begins but a reference point from which the actual start time is calculated, which is currently 3 target durations earlier to avoid the playback to stall.</p>
+		</li>
+		<li>
+			<p><code>{{ event_duration_arg }}</code> How long the <code>EVENT</code> mode should last, seconds.</p>
+			<p>Optional, 60 by default.</p>
+		</li>
+	</ul>
+
+	<h2>Examples</h2>
+	<ul>
+		{% macro example(comment, url) -%}
+		<li>
+			<a href="{{ url }}">{{ url }}</a>
+			<p>{{ comment }}</p>
+			<p><video controls height=200 src="{{ url }}"></video></p>
+		</li>
+		{%- endmacro %}		
+
+		{{ 
+			example(
+				"Use Apple's Basic 'BipBop' example in EVENT mode and switch it to VOD after 2 mins", 
+				url_for('proxy', url = 'apple1', duration = 120) 
+			) 
+		}}
+		{{ 
+			example(
+				"Use an example from THEO Player in EVENT mode and switch it to VOD after 3 mins", 
+				url_for('proxy', url = 'elephant', duration = 240) 
+			) 
+		}}
+	</ul>
+	
+	<h2>Aliases</h2>
+	<p>As mentioned above the <code>url</code> parameter of the <code>{{ url_for('proxy') }}</code> endpoint also accept aliases for well known URLs. Here is the full list:</p>
+	<ul>
+		{% for alias in aliases.items() %}
+		<li><code>{{ alias[0] }}</code> — <a href="{{ alias[1] }}">{{ alias[1] }}</a></li>
+		{% endfor %}
+	</ul>
+	
+</body>
+</html>
