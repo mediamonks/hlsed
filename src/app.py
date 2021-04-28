@@ -39,7 +39,7 @@ def string_param(name, default = None):
 def int_param(name, default = None):
 	return int(string_param(name, default))
 	
-@app.route('/hlsed/event')
+@app.route('/v1/eventify')
 def proxy():
 		
 	try:
