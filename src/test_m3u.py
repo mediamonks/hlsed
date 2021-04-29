@@ -82,12 +82,14 @@ class PlaylistTestCase(unittest.TestCase):
 		l.remove_global_tag('EXT-X-ENDLIST')
 			
 		# Note that the 'EXT-X-ENDLIST' has changed order, but it's fine, it's a global one.
-		self.assertEqual(l.text(), inspect.cleandoc("""
+		self.assertEqual(l.text().strip(), inspect.cleandoc("""
 			#EXTM3U
 			#EXT-X-TARGETDURATION:10
 			#EXT-X-VERSION:3
+			
 			#EXTINF:9.009,
 			edited.ts
+			
 			#EXTINF:3.003,
 			http://media.example.com/third.ts
 	   		"""

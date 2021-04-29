@@ -143,7 +143,18 @@ class Playlist:
 	
 	def text(self):
 		"""A textual representation of this (possibly modified) playlist ready to be saved to a file."""
-		return "\n".join(map(lambda item: item.text(), self.items())).encode('utf_8')
+		
+		# We could simply join items(), but this way it is possible to group things better.
+		nl = "\n"
+		result = nl.join(map(lambda t: t.text(), self.globals))
+		result += nl
+		for u in self.uris:
+			result += nl
+			result += nl.join(map(lambda t: t.text(), u.tags))
+			result += nl
+			result += u.text()
+			result += nl
+		return result.encode('utf_8')
 		
 	def save(self, path):
 		"""A convenience saving this (possibly modified) playlist to a file."""

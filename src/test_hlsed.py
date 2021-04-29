@@ -62,15 +62,17 @@ class EventToVODTestCase(unittest.TestCase):
 		# When the list is fetched initially, then it should be already going for at least 3 target durations.
 		self.toggle(self.ref_time + 0)
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
 				#EXT-X-TARGETDURATION:5
 				#EXT-X-VERSION:3
 				#EXT-X-PLAYLIST-TYPE:EVENT
+			
 				#EXTINF:5,
 				http://media.example.com/0.ts
+			
 				#EXTINF:10,
 				http://media.example.com/1.ts
 				"""
@@ -80,15 +82,17 @@ class EventToVODTestCase(unittest.TestCase):
 	def test_5(self):
 		self.toggle(self.ref_time + 5)
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
 				#EXT-X-TARGETDURATION:5
 				#EXT-X-VERSION:3
 				#EXT-X-PLAYLIST-TYPE:EVENT
+			
 				#EXTINF:5,
 				http://media.example.com/0.ts
+			
 				#EXTINF:10,
 				http://media.example.com/1.ts
 				"""
@@ -98,17 +102,20 @@ class EventToVODTestCase(unittest.TestCase):
 	def test_11(self):
 		self.toggle(self.ref_time + 11)
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
 				#EXT-X-TARGETDURATION:5
 				#EXT-X-VERSION:3
 				#EXT-X-PLAYLIST-TYPE:EVENT
+			
 				#EXTINF:5,
 				http://media.example.com/0.ts
+			
 				#EXTINF:10,
 				http://media.example.com/1.ts
+			
 				#EXTINF:10,
 				http://media.example.com/2.ts
 				"""
@@ -118,21 +125,26 @@ class EventToVODTestCase(unittest.TestCase):
 	def test_35(self):
 		self.toggle(self.ref_time + 35)
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
 				#EXT-X-TARGETDURATION:5
 				#EXT-X-VERSION:3
 				#EXT-X-PLAYLIST-TYPE:EVENT
+			
 				#EXTINF:5,
 				http://media.example.com/0.ts
+			
 				#EXTINF:10,
 				http://media.example.com/1.ts
+			
 				#EXTINF:10,
 				http://media.example.com/2.ts
+			
 				#EXTINF:10,
 				http://media.example.com/3.ts
+			
 				#EXTINF:15,
 				http://media.example.com/4.ts
 				"""
@@ -142,7 +154,7 @@ class EventToVODTestCase(unittest.TestCase):
 	def test_36(self):
 		self.toggle(self.ref_time + 36)
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
@@ -150,14 +162,19 @@ class EventToVODTestCase(unittest.TestCase):
 				#EXT-X-VERSION:3
 				#EXT-X-PLAYLIST-TYPE:VOD
 				#EXT-X-ENDLIST
+			
 				#EXTINF:5,
 				http://media.example.com/0.ts
+			
 				#EXTINF:10,
 				http://media.example.com/1.ts
+			
 				#EXTINF:10,
 				http://media.example.com/2.ts
+			
 				#EXTINF:10,
 				http://media.example.com/3.ts
+			
 				#EXTINF:15,
 				http://media.example.com/4.ts
 				"""
@@ -198,12 +215,14 @@ class RebaseTestCase(unittest.TestCase):
 		)
 		# Note that the first URI should remain absolute.
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
+			
 				#EXT-X-STREAM-INF:AVERAGE-BANDWIDTH=1000000,BANDWIDTH=1280000
 				http://monkapps.com:11000/hlsed?something=value&url=http%3A%2F%2Fexample.com%2Flow.m3u8
+			
 				#EXT-X-STREAM-INF:AVERAGE-BANDWIDTH=2000000,BANDWIDTH=2560000
 				http://monkapps.com:11000/hlsed?something=value&url=https%3A%2F%2Fanother.example.com%2Fplaylist%2Fmid.m3u8
 				"""
@@ -231,17 +250,20 @@ class RebaseTestCase(unittest.TestCase):
 		)
 		# No proxying for media playlists, only correcting relative URIs.
 		self.assertEqual(
-			self.playlist.text(),
+			self.playlist.text().strip(),
 			inspect.cleandoc(
 				"""
 				#EXTM3U
 				#EXT-X-VERSION:3
 				#EXT-X-TARGETDURATION:8
 				#EXT-X-MEDIA-SEQUENCE:2680
+
 				#EXTINF:7.975,
 				https://another.example.com/playlist/fileSequence2680.ts
+				
 				#EXTINF:7.941,
 				https://priv.example.com/fileSequence2681.ts
+			
 				"""
 			)
 		)
