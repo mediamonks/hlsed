@@ -5,9 +5,9 @@ from flask import Flask, request, url_for, make_response, abort, render_template
 import aliases
 import hlsed
 import m3u
+import time
 import urllib
 import urlparse
-import time
 
 app = Flask(__name__)
 
@@ -51,16 +51,17 @@ def url_overriding_scheme(url, scheme):
 	))
 	
 @app.route('/v1/eventify')
+@app.route('/v1/eventify.m3u8') # Chome on Android apparently relies on the extension instead of the content type!
 def proxy():
 		
 	try:
-	
+		
 		# Note that we cannot support URLs that are served by us, that would cause a deadlock, 
 		# and thus we don't attempt to make them absolute.
 		playlist_url = aliases.resolve_hls(string_param(URL_ARG))
 		
 		# Let's force 'https' for our own redirects because nginx might be using `http` with us.
-		# TODO: use a more generic approac
+		# TODO: use a more generic approach
 		proxy_url = url_overriding_scheme(request.url, "https")
 
 		# Let's use the current server time as a reference when the playlist is accessed withot one.
@@ -71,7 +72,7 @@ def proxy():
 			playlist = hlsed.download_and_rebase(playlist_url, proxy_url)
 		except Exception as e:
 			return ("Could not download or parse the given playlist: %s." % (e), 400)
-
+		
 		if playlist.is_master_playlist:
 			# Not much things to do for the master playlist yet.
 			pass
@@ -83,13 +84,14 @@ def proxy():
 				current_time = time.time(),
 				logger = app.logger
 			)
+			# hlsed.set_program_date_time(playlist, start_time)
 	except Exception as e:
 		app.logger.error("Error: %s" % (e))
 		return ("Unable to proxy: %s." % (e), 400)
 		
 	text = playlist.text()
-	#~ app.logger.debug(text)
+	# app.logger.debug(text)
 	response = make_response(text)
-	response.mimetype = "application/vnd.apple.mpegurl"
+	response.mimetype = "application/x-mpegurl"
 	response.headers["Cache-Control"] = "max-age=2"
 	return response
