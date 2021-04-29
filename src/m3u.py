@@ -236,7 +236,9 @@ class _TagInfo:
 		Info('EXT-X-GAP', 						NEXT_URI,			MEDIA_ONLY,			NO_VALUE),		
 		Info('EXT-X-BITRATE', 					NEXT_OCCURRENCE,	MEDIA_ONLY,			SINGLE_VALUE),
 		# TODO: This ones does not seem to fit our parsing model, check.
-		Info('EXT-X-PART', 						NEXT_OCCURRENCE,	MEDIA_ONLY,			ATTR_LIST),		
+		Info('EXT-X-PART', 						NEXT_OCCURRENCE,	MEDIA_ONLY,			ATTR_LIST),	
+		# Seems like something outdated?
+		Info('EXT-X-ALLOWCACHE', 				GLOBAL,				MEDIA_ONLY,			SINGLE_VALUE)		
 	]
 	_known_tags_by_name = dict(map(lambda t: (t.name, t), _known_tags))
 	
@@ -277,6 +279,10 @@ class URI:
 
 	def text(self):
 		return self.uri
+		
+	def remove_tag(self, name):
+		"""Removes all tags with the given name from this URI."""
+		self.tags = filter(lambda t: t.name != name, self.tags)
 
 class Tag:
 	

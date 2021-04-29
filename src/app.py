@@ -38,6 +38,17 @@ def string_param(name, default = None):
 
 def int_param(name, default = None):
 	return int(string_param(name, default))
+
+def url_overriding_scheme(url, scheme):
+	parsed = urlparse.urlparse(url)
+	return urlparse.urlunparse(urlparse.ParseResult(
+		scheme = scheme,
+		netloc = parsed.netloc,
+		path = parsed.path,
+		params = parsed.params,
+		query = parsed.query,
+		fragment = parsed.fragment
+	))
 	
 @app.route('/v1/eventify')
 def proxy():
@@ -47,8 +58,10 @@ def proxy():
 		# Note that we cannot support URLs that are served by us, that would cause a deadlock, 
 		# and thus we don't attempt to make them absolute.
 		playlist_url = aliases.resolve_hls(string_param(URL_ARG))
-	
-		proxy_url = request.url
+		
+		# Let's force 'https' for our own redirects because nginx might be using `http` with us.
+		# TODO: use a more generic approac
+		proxy_url = url_overriding_scheme(request.url, "https")
 
 		# Let's use the current server time as a reference when the playlist is accessed withot one.
 		start_time = int_param(START_TIME_ARG, int(time.time()))
