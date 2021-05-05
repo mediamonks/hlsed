@@ -60,9 +60,13 @@ def proxy():
 		# and thus we don't attempt to make them absolute.
 		playlist_url = aliases.resolve_hls(string_param(URL_ARG))
 		
-		# Let's force 'https' for our own redirects because nginx might be using `http` with us.
+		# Let's force 'https' for our own redirects when not debugging because 
+		# nginx might be using `http` with us. 
 		# TODO: use a more generic approach
-		proxy_url = url_overriding_scheme(request.url, "https")
+		if app.debug:
+			proxy_url = request.url
+		else:
+			proxy_url = url_overriding_scheme(request.url, "https")
 
 		# Let's use the current server time as a reference when the playlist is accessed withot one.
 		start_time = int_param(START_TIME_ARG, int(time.time()))
@@ -84,13 +88,13 @@ def proxy():
 				current_time = time.time(),
 				logger = app.logger
 			)
-			# hlsed.set_program_date_time(playlist, start_time)
 	except Exception as e:
 		app.logger.error("Error: %s" % (e))
 		return ("Unable to proxy: %s." % (e), 400)
 		
 	text = playlist.text()
-	# app.logger.debug(text)
+	if app.debug:
+		app.logger.debug(text)
 	response = make_response(text)
 	response.mimetype = "application/x-mpegurl"
 	response.headers["Cache-Control"] = "max-age=2"

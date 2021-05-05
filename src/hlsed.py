@@ -109,6 +109,13 @@ def event_to_vod(playlist, event_duration, ref_time, current_time, logger = logg
 		
 	# logger.debug("segments: %d out of %d" % (len(uris), len(playlist.uris)))	
 
+	# Let's embed the real time tag along the way.
+	if len(uris) > 0:
+		for u in uris:
+			u.remove_tag('EXT-X-PROGRAM-DATE-TIME')
+		time_string = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(start_time))
+		uris[0].tags.append(m3u.Tag('#EXT-X-PROGRAM-DATE-TIME:' + time_string))
+
 	playlist.uris = uris
 	
 	# Where are we within the period.
@@ -122,3 +129,4 @@ def event_to_vod(playlist, event_duration, ref_time, current_time, logger = logg
 		logger.debug("VOD mode")	
 		playlist.globals.append(m3u.Tag('#EXT-X-PLAYLIST-TYPE:VOD'))
 		playlist.globals.append(m3u.Tag('#EXT-X-ENDLIST'))
+	
