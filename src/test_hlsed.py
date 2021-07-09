@@ -190,11 +190,11 @@ class DownloadAndRebaseTestCase(unittest.TestCase):
 	def test_apple(self):
 		playlist = hlsed.download_and_rebase(
 			"https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8", 
-			"http://monkapps.com:11000/hlsed?something=value"
+			"http://example.com:11000/hlsed?something=value"
 		)
 		self.assertGreater(len(playlist.uris), 0)
 		for uri in playlist.uris:
-			self.assertEqual(urlparse.urlparse(uri.uri).netloc, "monkapps.com:11000")
+			self.assertEqual(urlparse.urlparse(uri.uri).netloc, "example.com:11000")
 
 class RebaseTestCase(unittest.TestCase):
 	
@@ -211,7 +211,7 @@ class RebaseTestCase(unittest.TestCase):
 		hlsed.rebase(
 			self.playlist, 
 			"https://another.example.com/playlist/index.m3u8", 
-			"http://monkapps.com:11000/hlsed?something=value"
+			"http://example.com:11000/hlsed?something=value"
 		)
 		# Note that the first URI should remain absolute.
 		self.assertEqual(
@@ -221,10 +221,10 @@ class RebaseTestCase(unittest.TestCase):
 				#EXTM3U
 			
 				#EXT-X-STREAM-INF:AVERAGE-BANDWIDTH=1000000,BANDWIDTH=1280000
-				http://monkapps.com:11000/hlsed?something=value&url=http%3A%2F%2Fexample.com%2Flow.m3u8
+				http://example.com:11000/hlsed?something=value&url=http%3A%2F%2Fexample.com%2Flow.m3u8
 			
 				#EXT-X-STREAM-INF:AVERAGE-BANDWIDTH=2000000,BANDWIDTH=2560000
-				http://monkapps.com:11000/hlsed?something=value&url=https%3A%2F%2Fanother.example.com%2Fplaylist%2Fmid.m3u8
+				http://example.com:11000/hlsed?something=value&url=https%3A%2F%2Fanother.example.com%2Fplaylist%2Fmid.m3u8
 				"""
 			)
 		)
@@ -246,7 +246,7 @@ class RebaseTestCase(unittest.TestCase):
 		hlsed.rebase(
 			self.playlist, 
 			"https://another.example.com/playlist/index.m3u8", 
-			"http://monkapps.com:11000/hlsed?something=value"
+			"http://example.com:11000/hlsed?something=value"
 		)
 		# No proxying for media playlists, only correcting relative URIs.
 		self.assertEqual(

@@ -51,7 +51,7 @@ def url_overriding_scheme(url, scheme):
 	))
 	
 @app.route('/v1/eventify')
-@app.route('/v1/eventify.m3u8') # Chome on Android apparently relies on the extension instead of the content type!
+@app.route('/v1/eventify.m3u8') # Chrome on Android apparently relies on the extension instead of the content type!
 def proxy():
 		
 	try:
@@ -82,11 +82,12 @@ def proxy():
 			pass
 		else:
 			hlsed.event_to_vod(
-				playlist, 
-				event_duration = int_param(EVENT_DURATION_ARG, 60), 
-				ref_time = start_time, 
-				current_time = time.time(),
-				logger = app.logger
+                playlist, 
+                event_duration = int_param(EVENT_DURATION_ARG, 60), 
+                ref_time = start_time, 
+                current_time = time.time(),
+                program_date_time = True,
+                logger = app.logger
 			)
 	except Exception as e:
 		app.logger.error("Error: %s" % (e))

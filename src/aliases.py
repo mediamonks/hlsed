@@ -1,7 +1,7 @@
 # HLS tools.
 # Copyright (C) 2021, MediaMonks B.V. All rights reserved.
 
-# This is to maintain a list of publically available HLS examples that can be easily refer to.
+# This is to maintain a list of publically available HLS examples that can be easily referred to.
 
 HLS = {
 	"apple1": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8",
