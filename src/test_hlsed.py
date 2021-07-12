@@ -27,6 +27,54 @@ class MiscTestCase(unittest.TestCase):
 			"http://example.com/?name=new-value&somethingelse=value2"
 		)
 
+class AdCuesTestCase(unittest.TestCase):
+	
+	def setUp(self):
+		self.playlist = m3u.Playlist(inspect.cleandoc(
+			"""
+			#EXTM3U
+			#EXT-X-TARGETDURATION:5
+			#EXT-X-VERSION:3
+			#EXTINF:5,
+			http://media.example.com/0.ts
+			#EXTINF:10,
+			http://media.example.com/1.ts
+			#EXTINF:10,
+			http://media.example.com/2.ts
+			#EXTINF:10,
+			http://media.example.com/3.ts
+			#EXTINF:15,
+			http://media.example.com/4.ts
+			#EXT-X-ENDLIST
+			"""
+		))
+		self.ref_time = 1234
+
+	def toggle(self, current_time):
+		hlsed.insert_ad_cues(
+			self.playlist, 
+			event_duration = 50,
+			ref_time = self.ref_time,
+			current_time = current_time,
+			time_between_ads = 10,
+			ad_duration = 5
+		)
+
+	def test_0(self):
+		self.toggle(self.ref_time + 0)
+		self.assertEqual(
+			self.playlist.text().strip(),
+			inspect.cleandoc(
+				"""
+				#EXTM3U
+				#EXT-X-TARGETDURATION:5
+				#EXT-X-VERSION:3
+				#EXT-X-PLAYLIST-TYPE:EVENT
+				"""
+			)
+		)
+        
+
 class EventToVODTestCase(unittest.TestCase):
 	
 	def setUp(self):

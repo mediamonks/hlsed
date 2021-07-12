@@ -25,6 +25,15 @@
 			<p><code>{{ event_duration_arg }}</code> How long the <code>EVENT</code> mode should last, seconds.</p>
 			<p>Optional, assumed to be 60 seconds by default.</p>
 		</li>
+		<li>
+			<p><code>{{ ad_interval_arg }}</code> Time in seconds between ad cue points inserted.</p>
+			<p>Optional, ad cue points are not inserted by default.</p>
+		</li>
+		<li>
+			<p><code>{{ ad_duration_arg }}</code> The length of each ad slot in seconds. 
+				Has effect only when <code>{{ ad_interval_arg }}</code> is provided.</p>
+			<p>Optional, 30 seconds by default.</p>
+		</li>
 	</ul>
 
 	<h2>Examples</h2>
@@ -41,6 +50,18 @@
 			example(
 				"Use Apple's Basic 'BipBop' example in EVENT mode and switch it to VOD after 2 mins.", 
 				url_for('proxy', url = 'apple1', duration = 120) 
+			) 
+		}}
+		{{ 
+			example(
+				"Use Apple's Basic 'BipBop' example in EVENT mode inserting 10 second ad slots 30 seconds.", 
+				url_for('proxy', url = 'apple1', duration = 600, ad_interval = 30, ad_duration = 10) 
+			) 
+		}}
+		{{ 
+			example(
+				"Use Apple's Basic 'BipBop' example in EVENT mode inserting 10 second ad slots 30 seconds apart with a bug similar to Elemental's (SCTE35-OUT only using auto_return).", 
+				url_for('proxy', url = 'apple1', duration = 600, ad_interval = 30, ad_duration = 10, ad_style = 1)
 			) 
 		}}
 		{{ 

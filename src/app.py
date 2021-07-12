@@ -15,6 +15,9 @@ app = Flask(__name__)
 URL_ARG = "url"
 START_TIME_ARG = "ref_time"
 EVENT_DURATION_ARG = "duration"
+AD_INTERVAL_ARG = "ad_interval"
+AD_DURATION_ARG = "ad_duration"
+AD_STYLE_ARG = "ad_style"
 
 @app.route('/')
 def help():
@@ -23,7 +26,10 @@ def help():
 		aliases = aliases.HLS,
 		url_arg = URL_ARG,
 		start_time_arg = START_TIME_ARG,
-		event_duration_arg = EVENT_DURATION_ARG
+		event_duration_arg = EVENT_DURATION_ARG,
+		ad_interval_arg = AD_INTERVAL_ARG,
+		ad_duration_arg = AD_DURATION_ARG,
+		ad_style_arg = AD_STYLE_ARG
 	)
 
 def string_param(name, default = None):
@@ -31,7 +37,7 @@ def string_param(name, default = None):
 	if v:
 		return v
 	else:
-		if default:
+		if default is not None:
 			return default
 		else:
 			raise Exception("Parameter '%s' is required" % (name,))
@@ -62,7 +68,7 @@ def proxy():
 		
 		# Let's force 'https' for our own redirects when not debugging because 
 		# nginx might be using `http` with us. 
-		# TODO: use a more generic approach
+		# TODO: get the scheme of the original request from the proxy.
 		if app.debug:
 			proxy_url = request.url
 		else:
@@ -71,6 +77,11 @@ def proxy():
 		# Let's use the current server time as a reference when the playlist is accessed withot one.
 		start_time = int_param(START_TIME_ARG, int(time.time()))
 		proxy_url = hlsed.url_overriding_query_param(proxy_url, START_TIME_ARG, str(start_time))
+
+		event_duration = int_param(EVENT_DURATION_ARG, 60), 
+		ad_interval = int_param(AD_INTERVAL_ARG, 0)
+		ad_duration = int_param(AD_DURATION_ARG, 30)
+		ad_style = int_param(AD_STYLE_ARG, hlsed.CUE_STYLE_IN_OUT)
 	
 		try:
 			playlist = hlsed.download_and_rebase(playlist_url, proxy_url)
@@ -81,14 +92,27 @@ def proxy():
 			# Not much things to do for the master playlist yet.
 			pass
 		else:
+			current_time = time.time()
 			hlsed.event_to_vod(
-                playlist, 
-                event_duration = int_param(EVENT_DURATION_ARG, 60), 
-                ref_time = start_time, 
-                current_time = time.time(),
-                program_date_time = True,
-                logger = app.logger
+				playlist, 
+				event_duration = event_duration,
+				ref_time = start_time, 
+				current_time = current_time,
+				program_date_time = True,
+				logger = app.logger
 			)
+			if ad_interval > 0 and ad_duration > 0:
+				hlsed.insert_ad_cues(
+					playlist,
+					event_duration = event_duration,
+					ref_time = start_time, 
+					current_time = current_time,
+					time_between_ads = ad_interval,
+					ad_duration = ad_duration, 
+					style = ad_style,
+					logger = app.logger
+				)
+
 	except Exception as e:
 		app.logger.error("Error: %s" % (e))
 		return ("Unable to proxy: %s." % (e), 400)
